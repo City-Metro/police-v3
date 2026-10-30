@@ -1,6 +1,6 @@
 /* ===== EDIT ME ===== */
 const ANNOUNCEMENT = {
-  enabled: true,
+  enabled: false,
   text: "Welcome to the new City Metro Transit Police website! This website is under development. In an emergency, always call 911.",
   linkText: "Report a concern",
   linkHref: "/"
