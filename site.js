@@ -25,7 +25,7 @@ const NAV = [
     { label: "Lego City Police", href: "https://lcpolice.wordpress.com" },
     { label: "LCSD", href: "https://lcsdonline.wordpress.com" } ] }
 ];
-const NOUPE_SNIPPET = ``;
+const NOUPE_SNIPPET = `<script src='https://www.noupe.com/embed/01a0f9a8fe0870008c410c945c6507b28d60.js'></script>`;;
 const SOCIAL = [
   { label: "Instagram", href: "https://instagram.com/citymetroalerts",
     icon: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/>' },
