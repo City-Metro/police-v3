@@ -1,9 +1,11 @@
 // Pages Function: GET /api/announcement
 // Proxies the banner from your worker. No wrangler.toml needed: add the service binding in the
 // Cloudflare dashboard (Pages project > Settings > Bindings > Add > Service binding, name: ANNOUNCE).
-const URL_FALLBACK = "https://ride-metro.felixfeger46.workers.dev/api/announcement";
+const DEFAULT_URL = "https://ride-metro.felixfeger46.workers.dev/api/announcement";
 
-export async function onRequestGet({ env }) {  // visit /api/announcement to see errors
+export async function onRequestGet({ env }) {
+  // Optional dashboard variable ANNOUNCEMENT_URL overrides the default below.
+  const URL_FALLBACK = env.ANNOUNCEMENT_URL || DEFAULT_URL;  // visit /api/announcement to see errors
   try {
     const res = env.ANNOUNCE
       ? await env.ANNOUNCE.fetch(URL_FALLBACK, { headers: { Accept: "application/json" } })
