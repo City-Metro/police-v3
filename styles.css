@@ -356,3 +356,5 @@ a.lb:hover,a.lb:focus-visible{transform:scale(1.08);outline:2px solid var(--blue
 .jobs li{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;padding:20px 24px;margin:12px 0;border:1.5px solid var(--tile);border-radius:20px}
 .jobs li span{color:var(--muted)}
 .jobs strong{display:block;font-size:1.1rem}
+.announce.warning{background:#fde68a;color:#3b2a00}
+.announce.critical{background:#b91c1c;color:#fff}
