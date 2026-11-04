@@ -1,6 +1,6 @@
 /* ===== EDIT ME ===== */
 const ANNOUNCEMENT = {
-  enabled: false,
+  enabled: true,
   text: "Welcome to the new City Metro Transit Police website! This website is under development. In an emergency, always call 911.",
   linkText: "Report a concern",
   linkHref: "/"
@@ -25,7 +25,7 @@ const NAV = [
     { label: "Lego City Police", href: "https://lcpolice.wordpress.com" },
     { label: "LCSD", href: "https://lcsdonline.wordpress.com" } ] }
 ];
-const NOUPE_SNIPPET = `<script src='https://www.noupe.com/embed/01a0f9a8fe0870008c410c945c6507b28d60.js'></script>`;;
+const NOUPE_SNIPPET = ``;
 const SOCIAL = [
   { label: "Instagram", href: "https://instagram.com/citymetroalerts",
     icon: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/>' },
@@ -44,10 +44,7 @@ function renderHeader() {
     : n.items
     ? `<li class="has-dd"><button class="dd-toggle" aria-expanded="false">${n.label}</button><ul class="dd-menu">${n.items.map(li).join("")}</ul></li>`
     : `<li><a class="nav-link ${path === n.href ? "active" : ""}" href="${n.href}">${n.label}</a></li>`).join("");
-  let bar = "";
-  if (ANNOUNCEMENT.enabled && !sessionStorage.getItem("announceClosed")) {
-    bar = `<div class="announce" role="region" aria-label="Announcement">${ANNOUNCEMENT.text} ${ANNOUNCEMENT.linkHref ? `<a href="${ANNOUNCEMENT.linkHref}">${ANNOUNCEMENT.linkText}</a>` : ""}<button aria-label="Dismiss">&times;</button></div>`;
-  }
+  const bar = `<div id="announce-slot"></div>`;
   document.getElementById("site-header").innerHTML = `${bar}
   <header class="site-header"><div class="container header-inner">
     <a class="logo" href="/" aria-label="CMTP home"><img src="/logo.png" alt="City Metro Transit Police"></a>
@@ -66,8 +63,43 @@ function renderHeader() {
     if (!wasOpen) { p.classList.add("open"); t.setAttribute("aria-expanded", "true"); }
   });
   document.addEventListener("click", () => document.querySelectorAll(".has-dd").forEach(x => x.classList.remove("open")));
-  const x = document.querySelector(".announce button");
-  if (x) x.onclick = () => { sessionStorage.setItem("announceClosed", "1"); x.parentElement.remove(); };
+  loadAnnouncement();
+}
+
+// Live banner: GET /api/announcement (Pages Function -> your worker via service binding).
+// Live data wins. If the fetch fails, the static ANNOUNCEMENT above is shown as a fallback.
+function showAnnouncement(a) {
+  const slot = document.getElementById("announce-slot");
+  if (!slot || !a || !a.text) return;
+  if (sessionStorage.getItem("announceClosed") === a.text) return;   // a new message shows again
+  const bar = document.createElement("div");
+  bar.className = "announce " + (["warning", "critical"].includes(a.type) ? a.type : "info");
+  bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Announcement");
+  bar.append(a.text + " ");
+  if (a.link) {
+    const l = document.createElement("a");
+    l.href = a.link; l.textContent = a.linkText || "Learn more";
+    if (/^https?:/i.test(a.link) && !a.link.startsWith(location.origin)) l.rel = "noopener";
+    bar.append(l);
+  }
+  const x = document.createElement("button");
+  x.setAttribute("aria-label", "Dismiss"); x.innerHTML = "&times;";
+  x.onclick = () => { sessionStorage.setItem("announceClosed", a.text); bar.remove(); };
+  bar.append(x);
+  slot.replaceChildren(bar);
+}
+
+async function loadAnnouncement() {
+  const fallback = ANNOUNCEMENT.enabled
+    ? { text: ANNOUNCEMENT.text, link: ANNOUNCEMENT.linkHref, linkText: ANNOUNCEMENT.linkText } : null;
+  try {
+    const r = await fetch("/api/announcement", { headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    showAnnouncement(data && data.text ? data : null);   // null = cleared on purpose, show nothing
+  } catch (e) {
+    showAnnouncement(fallback);
+  }
 }
 
 function renderFooter() {
