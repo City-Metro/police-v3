@@ -7,7 +7,7 @@ const ANNOUNCEMENT = {
 };
 // Live banner source: a worker route that returns {text, type, link} or null, with no sign-in needed.
 // Use the worker that serves GET /api/announcement publicly (your Alerts worker).
-const ANNOUNCEMENT_URL = "https://YOUR-ALERTS-WORKER.workers.dev/api/announcement";
+const ANNOUNCEMENT_URL = "https://ride-metro.felixfeger46.workers.dev/api/announcement";
 const NAV = [
   { label: "Report a Concern", href: "/" },
   { label: "Locations", href: "/locations" },
