@@ -1,10 +1,13 @@
 /* ===== EDIT ME ===== */
 const ANNOUNCEMENT = {
   enabled: true,
-  text: "Welcome to the new City Metro Transit Police website! In an emergency, always call 911.",
+  text: "Welcome to the new City Metro Transit Police website! This website is under development. In an emergency, always call 911.",
   linkText: "Report a concern",
   linkHref: "/"
 };
+// Live banner source: a worker route that returns {text, type, link} or null, with no sign-in needed.
+// Use the worker that serves GET /api/announcement publicly (your Alerts worker).
+const ANNOUNCEMENT_URL = "https://YOUR-ALERTS-WORKER.workers.dev/api/announcement";
 const NAV = [
   { label: "Report a Concern", href: "/" },
   { label: "Locations", href: "/locations" },
@@ -25,7 +28,7 @@ const NAV = [
     { label: "Lego City Police", href: "https://lcpolice.wordpress.com" },
     { label: "LCSD", href: "https://lcsdonline.wordpress.com" } ] }
 ];
-const NOUPE_SNIPPET = `<script src="https://www.noupe.com/embed/01a0f9a8fe0870008c410c945c6507b28d60.js"></script>`;
+const NOUPE_SNIPPET = ``;
 const SOCIAL = [
   { label: "Instagram", href: "https://instagram.com/citymetroalerts",
     icon: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/>' },
@@ -66,7 +69,7 @@ function renderHeader() {
   loadAnnouncement();
 }
 
-// Live banner: GET /api/announcement (Pages Function -> your worker via service binding).
+// Live banner: fetched straight from ANNOUNCEMENT_URL (worker allows CORS).
 // Live data wins. If the fetch fails, the static ANNOUNCEMENT above is shown as a fallback.
 function showAnnouncement(a) {
   const slot = document.getElementById("announce-slot");
@@ -93,7 +96,7 @@ async function loadAnnouncement() {
   const fallback = ANNOUNCEMENT.enabled
     ? { text: ANNOUNCEMENT.text, link: ANNOUNCEMENT.linkHref, linkText: ANNOUNCEMENT.linkText } : null;
   try {
-    const r = await fetch("/api/announcement", { headers: { Accept: "application/json" } });
+    const r = await fetch(ANNOUNCEMENT_URL, { headers: { Accept: "application/json" } });
     if (!r.ok) throw new Error(r.status);
     const data = await r.json();
     showAnnouncement(data && data.text ? data : null);   // null = cleared on purpose, show nothing
